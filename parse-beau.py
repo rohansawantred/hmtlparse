@@ -17,6 +17,7 @@ def login(session, login_url, username, password, user_sel, pass_sel, button_sel
     # Fetch login page
     resp = session.get(login_url)
     resp.raise_for_status()
+    print(resp.text)
     soup = BeautifulSoup(resp.text, 'html.parser')
 
     # Locate fields/buttons by CSS selector

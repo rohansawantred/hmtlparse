@@ -6,7 +6,9 @@ Uses Selenium to log into a website with provided credentials,
 then navigates to the home page and prints out all headings,
 paragraphs, and links.
 """
-
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -14,6 +16,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from getpass import getpass
 import sys
+import time 
 
 def setup_driver(headless: bool = True):
     options = Options()
@@ -22,6 +25,8 @@ def setup_driver(headless: bool = True):
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-gpu")
     driver = webdriver.Chrome(options=options)
+    #service = Service(ChromeDriverManager().install())
+    #driver  = webdriver.Chrome(service=service)
     return driver
 
 def login(driver, login_url, username, password,
@@ -34,11 +39,11 @@ def login(driver, login_url, username, password,
     driver.find_element(By.CSS_SELECTOR, user_selector).send_keys(username)
     driver.find_element(By.CSS_SELECTOR, pass_selector).send_keys(password)
     driver.find_element(By.CSS_SELECTOR, submit_selector).click()
-
+    time.sleep(2)
     # wait for URL to change or some element on home page
-    WebDriverWait(driver, 10).until(
-        EC.url_changes(login_url)
-    )
+    #WebDriverWait(driver, 10).until(
+    #    EC.url_changes(login_url)
+    #)
 
 def parse_homepage(driver, home_url):
     driver.get(home_url)
@@ -86,7 +91,7 @@ def main():
         print(f"\nLogging in to {login_url}...")
         login(driver, login_url, username, password, user_sel, pass_sel, submit_sel)
         print("✅ Login successful")
-
+        time.sleep(2)
         print(f"\nParsing home page at {home_url}...")
         parse_homepage(driver, home_url)
     except Exception as e:

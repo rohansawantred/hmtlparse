@@ -1,0 +1,37 @@
+=== Included Elements with Aria-Label ===
+[LOG] 1. <input> name='', id='radio-input-triptype-oneWay', type='radio'
+      - original XPath: //*[@id="radio-input-triptype-oneWay"]
+      - aria-label: ''
+--------------------------------------------------------------------------------
+[LOG] 2. <input> name='', id='radio-input-triptype-roundTrip', type='radio'
+      - original XPath: //*[@id="radio-input-triptype-roundTrip"]
+      - aria-label: ''
+--------------------------------------------------------------------------------
+[LOG] 3. <input> name='', id='radio-input-triptype-multiCity', type='radio'
+      - original XPath: //*[@id="radio-input-triptype-multiCity"]
+      - aria-label: ''
+--------------------------------------------------------------------------------
+[LOG] 4. <input> name='', id='', type='text'
+      - original XPath: /html[1]/body[1]/main[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div[1]/input[1]
+      - aria-label: 'sourceCity'
+--------------------------------------------------------------------------------
+[LOG] 5. <input> name='', id='', type='text'
+      - original XPath: /html[1]/body[1]/main[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/div[1]/input[1]
+      - aria-label: 'destinationCity'
+--------------------------------------------------------------------------------
+[LOG] 6. <input> name='', id='', type='text'
+      - original XPath: /html[1]/body[1]/main[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[3]/div[1]/input[1]
+      - aria-label: 'departureDate'
+--------------------------------------------------------------------------------
+[LOG] 7. <input> name='', id='', type='text'
+      - original XPath: /html[1]/body[1]/main[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[4]/div[1]/input[1]
+      - aria-label: 'arrivalDate'
+--------------------------------------------------------------------------------
+[LOG] 8. <input> name='', id='', type='text'
+      - original XPath: /html[1]/body[1]/main[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[5]/div[1]/input[1]
+      - aria-label: 'Pax Selection'
+--------------------------------------------------------------------------------
+[LOG] 9. <button> name='', id='', type='button'
+      - original XPath: /html[1]/body[1]/main[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[4]/div[1]/div[2]/button[1]
+      - aria-label: ''
+--------------------------------------------------------------------------------

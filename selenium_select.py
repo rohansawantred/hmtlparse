@@ -1,38 +1,18 @@
-#!/usr/bin/env python3
-"""
-Modified Script: highlight_and_generate_selectors.py
-
-This script:
-1. Loads a page (e.g., Indigo login).
-2. Waits for React-rendered DOM.
-3. Finds all <input> and <button> elements.
-4. For each element, finds its nearest ancestor (including itself) that has any `aria-*` attribute.
-5. Generates a CSS selector for that ancestor (or the element itself if no such ancestor).
-6. Highlights the ancestor with a red border and scrolls into view briefly.
-7. Prints each element’s tag, attributes, the found aria-* ancestor’s tag/attributes, and the generated CSS selector.
-
-Usage:
-    python3 highlight_and_generate_selectors.py
-"""
-
-import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import time
 
 # === Configuration ===
-PAGE_URL = "https://6epartner-preprod.goindigo.in/"  # Replace with the actual URL
-WAIT_AFTER_LOAD = 30
-WAIT_RENDER = 10
-
-# === Helper Functions ===
+LOGIN_URL = "https://6epartner-preprod.goindigo.in/"  # Replace with the actual login URL
+WAIT_AFTER_LOGIN = 30
+WAIT_REACT_RENDER = 10
 
 def find_aria_ancestor(driver, element):
     """
     JavaScript snippet to return the closest ancestor (including the element itself)
-    that has any attribute starting with 'aria-'. Returns null if none found.
+    that has any attribute starting with 'aria-'. Returns None if none found.
     """
     script = """
     (function(el) {
@@ -70,118 +50,114 @@ def build_css_selector(element):
 
     return tag
 
-def get_element_summary(driver, element):
-    """
-    Return a dictionary with key attributes to help identify the element:
-      - tag, type, id, name, placeholder, aria-* attributes (as dict)
-    Uses JavaScript to collect aria-* attributes.
-    """
-    summary = {
-        "tag": element.tag_name.lower(),
-        "type": element.get_attribute("type") or "",
-        "id": element.get_attribute("id") or "",
-        "name": element.get_attribute("name") or "",
-        "placeholder": element.get_attribute("placeholder") or "",
-        "aria_attributes": {}
-    }
-    # Use JavaScript to collect all aria-* attributes
-    aria_attrs = driver.execute_script(
-        """
-        var el = arguments[0];
-        var items = {};
-        for (var i = 0; i < el.attributes.length; i++) {
-          var attr = el.attributes[i];
-          if (attr.name.startsWith('aria-')) {
-            items[attr.name] = attr.value;
-          }
-        }
-        return items;
-        """,
-        element
-    )
-    summary["aria_attributes"] = aria_attrs or {}
-    return summary
+# === Start Browser ===
+driver = webdriver.Chrome()
+driver.get(LOGIN_URL)
 
-# === Main Script ===
+print(f"Please login manually in the browser window. Waiting {WAIT_AFTER_LOGIN} seconds...")
+time.sleep(WAIT_AFTER_LOGIN)
 
-chrome_options = Options()
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-gpu")
-# Disable HTTP/2 to avoid protocol errors
-chrome_options.add_argument("--disable-http2")
-chrome_options.add_argument("--disable-quic")
-
-driver = webdriver.Chrome(options=chrome_options)
-wait = WebDriverWait(driver, 20)
-
+# === Wait for React-rendered DOM ===
 try:
-    driver.get(PAGE_URL)
-    print(f"Waiting {WAIT_AFTER_LOAD} seconds for manual login or initial load...")
-    time.sleep(WAIT_AFTER_LOAD)
+    WebDriverWait(driver, WAIT_REACT_RENDER).until(
+        EC.presence_of_element_located((By.TAG_NAME, "form"))
+    )
+except:
+    print("Warning: Form not found after waiting. Proceeding anyway.")
 
-    # Wait until a <form> appears, indicating React has rendered
-    try:
-        wait.until(EC.presence_of_element_located((By.TAG_NAME, "form")))
-    except:
-        print("Warning: No <form> found after waiting. Proceeding anyway.")
+time.sleep(WAIT_REACT_RENDER)
 
-    time.sleep(WAIT_RENDER)
+# === Collect Form Elements ===
+form_elements = driver.find_elements(By.XPATH, "//input | //textarea | //select | //button")
+included_elements = []
 
-    # Collect all <input> and <button> elements
-    elements = driver.find_elements(By.XPATH, "//input | //button")
-    print(f"\nFound {len(elements)} <input> or <button> elements.\n")
+print("\n=== Processing Form Components ===")
+for i, elem in enumerate(form_elements, 1):
+    tag = elem.tag_name
+    elem_type = elem.get_attribute("type") or ""
+    name = elem.get_attribute("name") or ""
+    id_ = elem.get_attribute("id") or ""
+    placeholder = elem.get_attribute("placeholder") or ""
+    inner_html = driver.execute_script("return arguments[0].innerHTML;", elem)
 
-    for idx, elem in enumerate(elements, start=1):
-        # 1) Get basic summary of the element
-        elem_summary = get_element_summary(driver, elem)
+    # Highlight with red border
+    driver.execute_script(
+        "arguments[0].parentElement.style.border='2px solid red';"
+        "arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});",
+        elem
+    )
+    time.sleep(1)  # Give time to view the element
 
-        # 2) Find the nearest ancestor (or itself) with an aria-* attribute
-        aria_element = find_aria_ancestor(driver, elem)
+    print(f"""{i}. <{tag}>
+    - type: '{elem_type}'
+    - name: '{name}'
+    - id: '{id_}'
+    - placeholder: '{placeholder}'
+    - innerHTML: \"{inner_html.strip()[:100]}\"{'...' if len(inner_html.strip()) > 100 else ''}""")
 
-        if aria_element:
-            ancestor_summary = get_element_summary(driver, aria_element)
-            selector = build_css_selector(aria_element)
-
-            # Highlight the ancestor
-            driver.execute_script(
-                "arguments[0].style.border='2px solid red'; arguments[0].scrollIntoView({behavior:'smooth', block:'center'});",
-                aria_element
-            )
-            time.sleep(1)
-            driver.execute_script("arguments[0].style.border='';", aria_element)
-
+    # Prompt user for inclusion
+    choice = input("Include this element? (y/n): ").strip().lower()
+    if choice == 'y':
+        # Find nearest ancestor with aria-* (including itself)
+        aria_ancestor = find_aria_ancestor(driver, elem)
+        if aria_ancestor:
+            ancestor_tag = aria_ancestor.tag_name
+            ancestor_id = aria_ancestor.get_attribute("id") or ""
+            ancestor_class = aria_ancestor.get_attribute("class") or ""
+            # Build CSS selector for the ancestor
+            ancestor_selector = build_css_selector(aria_ancestor)
+            # Collect its aria-* attributes
+            aria_attrs = driver.execute_script(
+                """
+                var el = arguments[0];
+                var items = {};
+                for (var i = 0; i < el.attributes.length; i++) {
+                  var attr = el.attributes[i];
+                  if (attr.name.startsWith('aria-')) {
+                    items[attr.name] = attr.value;
+                  }
+                }
+                return items;
+                """,
+                aria_ancestor
+            ) or {}
         else:
-            ancestor_summary = None
-            selector = build_css_selector(elem)
+            ancestor_tag = None
+            ancestor_id = ""
+            ancestor_class = ""
+            ancestor_selector = build_css_selector(elem)
+            aria_attrs = {}
 
-            # Highlight the element itself
-            driver.execute_script(
-                "arguments[0].style.border='2px solid red'; arguments[0].scrollIntoView({behavior:'smooth', block:'center'});",
-                elem
-            )
-            time.sleep(1)
-            driver.execute_script("arguments[0].style.border='';", elem)
+        included_elements.append({
+            'tag': tag,
+            'type': elem_type,
+            'name': name,
+            'id': id_,
+            'placeholder': placeholder,
+            'innerHTML': inner_html,
+            'aria_ancestor_tag': ancestor_tag,
+            'aria_ancestor_id': ancestor_id,
+            'aria_ancestor_class': ancestor_class,
+            'aria_ancestor_selector': ancestor_selector,
+            'aria_attributes': aria_attrs
+        })
 
-        # 3) Print results
-        print(f"{idx}. Element: <{elem_summary['tag']}>")
-        print(f"   - type: '{elem_summary['type']}', id: '{elem_summary['id']}', name: '{elem_summary['name']}', placeholder: '{elem_summary['placeholder']}'")
-        if elem_summary["aria_attributes"]:
-            print(f"   - aria- attributes: {elem_summary['aria_attributes']}")
-        if ancestor_summary:
-            print(f"   -> Aria ancestor: <{ancestor_summary['tag']}>")
-            print(f"      - type: '{ancestor_summary['type']}', id: '{ancestor_summary['id']}', name: '{ancestor_summary['name']}', placeholder: '{ancestor_summary['placeholder']}'")
-            if ancestor_summary["aria_attributes"]:
-                print(f"      - aria- attributes: {ancestor_summary['aria_attributes']}")
-            print(f"      - generated CSS selector: {selector}")
-        else:
-            print("   -> No ancestor with aria-* found. Using element itself.")
-            print(f"      - generated CSS selector: {selector}")
+    # Clear the highlight
+    driver.execute_script("arguments[0].style.border='';", elem)
 
-        print("-" * 80)
+# === Summary ===
+print("\n=== Included Elements with Aria-Ancestor Info ===")
+for idx, item in enumerate(included_elements, 1):
+    print(f"{idx}. <{item['tag']}> name='{item['name']}', id='{item['id']}', type='{item['type']}'")
+    if item['aria_ancestor_tag']:
+        print(f"   -> Aria Ancestor: <{item['aria_ancestor_tag']}>")
+        print(f"      - id: '{item['aria_ancestor_id']}', class: '{item['aria_ancestor_class']}'")
+        print(f"      - aria-* attributes: {item['aria_attributes']}")
+        print(f"      - generated CSS selector: {item['aria_ancestor_selector']}")
+    else:
+        print("   -> No ancestor with aria-* found. Using element itself for selector:")
+        print(f"      - generated CSS selector: {item['aria_ancestor_selector']}")
+    print("-" * 80)
 
-    print("\nDone. Closing browser in 5 seconds...")
-    time.sleep(5)
-
-finally:
-    driver.quit()
+input("\nPress Enter to close the browser...")
+driver.quit()

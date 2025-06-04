@@ -1,0 +1,45 @@
+======================================================================
+ERROR: test_select_trip_type_radio_buttons (__main__.IndigoInputTests.test_select_trip_type_radio_buttons)
+Verify that each trip-type radio button can be selected.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\rohan.x.sawat\Downloads\selenium-test.py", line 37, in test_select_trip_type_radio_buttons
+    oneway.click()
+  File "C:\Users\rohan.x.sawat\AppData\Local\Programs\Python\Python312\Lib\site-packages\selenium\webdriver\remote\webelement.py", line 121, in click
+    self._execute(Command.CLICK_ELEMENT)
+  File "C:\Users\rohan.x.sawat\AppData\Local\Programs\Python\Python312\Lib\site-packages\selenium\webdriver\remote\webelement.py", line 574, in _execute
+    return self._parent.execute(command, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rohan.x.sawat\AppData\Local\Programs\Python\Python312\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 447, in execute
+    self.error_handler.check_response(response)
+  File "C:\Users\rohan.x.sawat\AppData\Local\Programs\Python\Python312\Lib\site-packages\selenium\webdriver\remote\errorhandler.py", line 232, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.ElementNotInteractableException: Message: element not interactable
+  (Session info: chrome=137.0.7151.56)
+Stacktrace:
+        GetHandleVerifier [0x0x7ff7d6c9fea5+79173]
+        GetHandleVerifier [0x0x7ff7d6c9ff00+79264]
+        (No symbol) [0x0x7ff7d6a59c8c]
+        (No symbol) [0x0x7ff7d6ab1a84]
+        (No symbol) [0x0x7ff7d6aa3464]
+        (No symbol) [0x0x7ff7d6ad896a]
+        (No symbol) [0x0x7ff7d6aa2d16]
+        (No symbol) [0x0x7ff7d6ad8b80]
+        (No symbol) [0x0x7ff7d6b0100d]
+        (No symbol) [0x0x7ff7d6ad8743]
+        (No symbol) [0x0x7ff7d6aa14c1]
+        (No symbol) [0x0x7ff7d6aa2253]
+        GetHandleVerifier [0x0x7ff7d6f6a2dd+3004797]
+        GetHandleVerifier [0x0x7ff7d6f6472d+2981325]
+        GetHandleVerifier [0x0x7ff7d6f83380+3107360]
+        GetHandleVerifier [0x0x7ff7d6cbaa2e+188622]
+        GetHandleVerifier [0x0x7ff7d6cc22bf+219487]
+        GetHandleVerifier [0x0x7ff7d6ca8df4+115860]
+        GetHandleVerifier [0x0x7ff7d6ca8fa9+116297]
+        GetHandleVerifier [0x0x7ff7d6c8f558+11256]
+        (No symbol) [0x0x7ff99208259d]
+        RtlUserThreadStart [0x0x7ff992aaaf58+40]
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 124.808s

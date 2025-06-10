@@ -1,0 +1,2 @@
+system_prompt: "You generate Python Selenium scripts."
+user_prompt: "Generate a complete Selenium Python method named `{method_name}` that performs the following browser actions in order:\n\n{actions_list}" 

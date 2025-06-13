@@ -104,7 +104,20 @@ def bytes_to_image(img_bytes: bytes) -> Image.Image:
     img = Image.open(buf)
     img.load()
     return img
-
+    
+def extract_code(text: str) -> str:
+    """
+    Extracts and returns only the contents of code fences (```...```).
+    If multiple blocks exist, concatenates them.
+    Falls back to returning full text if no fences found.
+    """
+    pattern = r"```(?:[^\n]*)\n([\s\S]*?)```"
+    blocks = re.findall(pattern, text)
+    if blocks:
+        # strip leading/trailing whitespace from each block
+        return "\n\n".join(block.strip() for block in blocks).strip()
+    return text.strip()
+    
 def annotate_pil_image(
     img: Image.Image,
     text: str,
